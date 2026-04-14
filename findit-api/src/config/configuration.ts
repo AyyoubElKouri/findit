@@ -64,5 +64,6 @@ export default () => ({
       process.env.MAX_PUSH_NOTIFS_PER_DAY ?? '3',
       10,
     ),
+    devMode: process.env.DEV_MODE === 'true',
   },
 });
