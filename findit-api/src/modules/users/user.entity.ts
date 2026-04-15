@@ -24,22 +24,22 @@ export class User {
   email: string;
 
   @Column({ type: 'varchar', nullable: true })
-  password_hash: string;
+  password_hash: string | null;
 
   @Column({ type: 'enum', enum: AuthProvider, default: AuthProvider.EMAIL })
   provider: AuthProvider;
 
   @Column({ type: 'varchar', nullable: true })
-  provider_id: string;
+  provider_id: string | null;
 
   @Column({ type: 'varchar', length: 100 })
   nom: string;
 
   @Column({ type: 'varchar', nullable: true })
-  photo_url: string;
+  photo_url: string | null;
 
   @Column({ type: 'decimal', precision: 3, scale: 2, nullable: true })
-  note_fiabilite: number;
+  note_fiabilite: number | null;
 
   @CreateDateColumn()
   date_inscription: Date;
@@ -54,7 +54,7 @@ export class User {
   email_verified: boolean;
 
   @Column({ type: 'varchar', nullable: true })
-  push_token: string;
+  push_token: string | null;
 
   @Column({ type: 'int', default: 0 })
   reports_count: number;
