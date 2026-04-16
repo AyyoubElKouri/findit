@@ -468,7 +468,7 @@ export class ReportsService {
       return [];
     }
 
-    const distances = await this.reportsRepository.query(
+    const distancesRaw: unknown = await this.reportsRepository.query(
       `SELECT m.id AS match_id,
               ST_Distance(rf.location, rl.location) AS distance_meters
        FROM matches m
@@ -477,6 +477,10 @@ export class ReportsService {
        WHERE m.id = ANY($1::uuid[])`,
       [matches.map((match) => match.id)],
     );
+
+    const distances = Array.isArray(distancesRaw)
+      ? (distancesRaw as Array<{ match_id: string; distance_meters: string }>)
+      : [];
 
     const distanceMap = new Map<string, number>(
       distances.map((row: { match_id: string; distance_meters: string }) => [

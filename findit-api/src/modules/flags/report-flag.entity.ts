@@ -42,10 +42,10 @@ export class ReportFlag {
   target_id: string;
 
   @Column({ type: 'enum', enum: FlagMotif, nullable: true })
-  motif: FlagMotif;
+  motif: FlagMotif | null;
 
   @Column({ type: 'varchar', length: 300, nullable: true })
-  description: string;
+  description: string | null;
 
   @CreateDateColumn()
   created_at: Date;
