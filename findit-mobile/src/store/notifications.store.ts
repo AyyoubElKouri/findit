@@ -1,4 +1,8 @@
 import { create } from 'zustand';
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
+import axios from 'axios';
 
 export interface NotificationsState {
   hasPermission: boolean | null;
@@ -10,15 +14,35 @@ export interface NotificationsActions {
   registerToken: () => Promise<void>;
 }
 
-export const useNotificationsStore = create<NotificationsState & NotificationsActions>((set) => ({
+export const useNotificationsStore = create<NotificationsState & NotificationsActions>((set, get) => ({
   hasPermission: null,
   expoPushToken: null,
 
-  // Actions (to be implemented on Day 6)
   requestPermission: async () => {
-    // TODO: Implement on Day 6
+    if (!Device.isDevice) {
+      set({ hasPermission: false });
+      return;
+    }
+    let { status } = await Notifications.getPermissionsAsync();
+    if (status !== 'granted') {
+      const res = await Notifications.requestPermissionsAsync();
+      status = res.status;
+    }
+    set({ hasPermission: status === 'granted' });
   },
+
   registerToken: async () => {
-    // TODO: Implement on Day 6
+    const hasPermission = get().hasPermission;
+    if (!hasPermission) return;
+    const projectId = Constants.expoConfig?.extra?.eas?.projectId;
+    const token = await Notifications.getExpoPushTokenAsync({ projectId });
+    set({ expoPushToken: token.data });
+    // Envoi au backend
+    try {
+      const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
+      await axios.patch(`${API_URL}/users/me/push-token`, { push_token: token.data });
+    } catch (e) {
+      // Optionnel: gestion d'erreur
+    }
   },
 }));
