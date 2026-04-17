@@ -7,7 +7,7 @@ import { borderRadius, colors, spacing, typography } from '../../constants/theme
 import { ROUTES } from '../../navigation/routes';
 import { AuthStackParamList } from '../../navigation/types';
 
-type Props = NativeStackScreenProps<AuthStackParamList, typeof ROUTES.REGISTER>;
+type Props = NativeStackScreenProps<AuthStackParamList, typeof ROUTES.FORGOT_PASSWORD>;
 
 export function ForgotPasswordScreen({ navigation }: Props) {
   const [confirmation, setConfirmation] = useState<string | null>(null);
@@ -17,13 +17,18 @@ export function ForgotPasswordScreen({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Mot de passe oublie</Text>
-      <Text style={styles.caption}>La reinitialisation de mot de passe par email n'est pas disponible.</Text>
+      <Text style={styles.title} allowFontScaling minimumFontScale={0.9}>Mot de passe oublie</Text>
+      <Text style={styles.caption} allowFontScaling minimumFontScale={0.9}>La reinitialisation de mot de passe par email n'est pas disponible.</Text>
 
-      {confirmation ? <Text style={styles.confirmation}>{confirmation}</Text> : null}
+      {confirmation ? <Text style={styles.confirmation} allowFontScaling minimumFontScale={0.9}>{confirmation}</Text> : null}
       <Button title="Compris" onPress={onSubmit} />
-      <Pressable onPress={() => navigation.navigate(ROUTES.LOGIN)}>
-        <Text style={styles.link}>Retour a la connexion</Text>
+      <Pressable
+        onPress={() => navigation.navigate(ROUTES.LOGIN)}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel="Retour a la connexion"
+      >
+        <Text style={styles.link} allowFontScaling minimumFontScale={0.9}>Retour a la connexion</Text>
       </Pressable>
     </View>
   );

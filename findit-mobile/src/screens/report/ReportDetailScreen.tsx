@@ -1,7 +1,6 @@
 import { Image } from 'expo-image';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  ActivityIndicator,
   Alert,
   FlatList,
   Modal,
@@ -20,7 +19,9 @@ import { MatchCard } from '../../components/report/MatchCard';
 import { Avatar } from '../../components/shared/Avatar';
 import { Badge } from '../../components/shared/Badge';
 import { Button } from '../../components/shared/Button';
+import { EmptyState } from '../../components/shared/EmptyState';
 import { ErrorMessage } from '../../components/shared/ErrorMessage';
+import { SkeletonBlock } from '../../components/shared/SkeletonBlock';
 import { StarRating } from '../../components/shared/StarRating';
 import { borderRadius, colors, spacing, typography } from '../../constants/theme';
 import { ROUTES } from '../../navigation/routes';
@@ -245,8 +246,19 @@ export function ReportDetailScreen({ route, navigation }: any) {
 
   if (isLoading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color={colors.primary} />
+      <View style={styles.skeletonRoot}>
+        <SkeletonBlock style={styles.skeletonGallery} />
+        <View style={styles.skeletonSection}>
+          <SkeletonBlock style={styles.skeletonBadgeRow} />
+          <SkeletonBlock style={styles.skeletonMainTitle} />
+          <SkeletonBlock style={styles.skeletonLineLong} />
+          <SkeletonBlock style={styles.skeletonLineLong} />
+          <SkeletonBlock style={styles.skeletonParagraph} />
+        </View>
+        <View style={styles.skeletonSection}>
+          <SkeletonBlock style={styles.skeletonSectionTitle} />
+          <SkeletonBlock style={styles.skeletonUserCard} />
+        </View>
       </View>
     );
   }
@@ -254,13 +266,11 @@ export function ReportDetailScreen({ route, navigation }: any) {
   if (error || !report) {
     return (
       <View style={styles.centered}>
-        <ErrorMessage message={error ?? 'Signalement introuvable.'} />
-        <Button
-          title="Réessayer"
-          variant="secondary"
-          containerStyle={styles.retryButton}
-          onPress={loadReport}
-        />
+        {error ? (
+          <ErrorMessage message={error} retryLabel="Réessayer" onRetry={loadReport} />
+        ) : (
+          <EmptyState title="Signalement introuvable" actionLabel="Retour" onAction={() => navigation.goBack()} />
+        )}
       </View>
     );
   }
@@ -297,7 +307,7 @@ export function ReportDetailScreen({ route, navigation }: any) {
             </>
           ) : (
             <View style={styles.photoPlaceholder}>
-              <Text style={styles.photoPlaceholderIcon}>📦</Text>
+              <Text style={styles.photoPlaceholderIcon} allowFontScaling={false}>📦</Text>
             </View>
           )}
         </View>
@@ -309,19 +319,26 @@ export function ReportDetailScreen({ route, navigation }: any) {
             <Badge label={statusLabel} tone={statusTone} />
           </View>
 
-          <Text style={styles.title}>{report.titre}</Text>
-          <Text style={styles.metaText}>📍 {report.adresse}</Text>
-          <Text style={styles.metaText}>📅 {formattedEventDate}</Text>
+          <Text style={styles.title} allowFontScaling minimumFontScale={0.9}>{report.titre}</Text>
+          <Text style={styles.metaText} allowFontScaling minimumFontScale={0.9}>📍 {report.adresse}</Text>
+          <Text style={styles.metaText} allowFontScaling minimumFontScale={0.9}>📅 {formattedEventDate}</Text>
 
           <Text
             style={styles.description}
             numberOfLines={expandedDescription ? undefined : 3}
+            allowFontScaling
+            minimumFontScale={0.9}
           >
             {report.description}
           </Text>
           {report.description.length > 180 ? (
-            <Pressable onPress={() => setExpandedDescription((value) => !value)}>
-              <Text style={styles.linkText}>
+            <Pressable
+              onPress={() => setExpandedDescription((value) => !value)}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={expandedDescription ? 'Voir moins la description' : 'Voir plus la description'}
+            >
+              <Text style={styles.linkText} allowFontScaling minimumFontScale={0.9}>
                 {expandedDescription ? 'Voir moins' : 'Voir plus'}
               </Text>
             </Pressable>
@@ -329,19 +346,23 @@ export function ReportDetailScreen({ route, navigation }: any) {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Auteur</Text>
+          <Text style={styles.sectionTitle} allowFontScaling minimumFontScale={0.9}>Auteur</Text>
           <Pressable
             style={styles.userCard}
             onPress={() => navigation.navigate(ROUTES.USER_PUBLIC_PROFILE, { userId: report.user.id })}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={`Profil public de ${report.user.nom}`}
+            accessibilityHint="Ouvrir le profil de l'auteur"
           >
             <Avatar uri={report.user.photo_url} name={report.user.nom} size={48} />
             <View style={styles.userInfo}>
-              <Text style={styles.userName}>{report.user.nom}</Text>
+              <Text style={styles.userName} allowFontScaling minimumFontScale={0.9}>{report.user.nom}</Text>
               <View style={styles.userMetaRow}>
                 {report.user.note_fiabilite !== null ? (
                   <StarRating value={report.user.note_fiabilite} />
                 ) : null}
-                <Text style={styles.userMetaText}>Publié {formatDate(report.created_at)}</Text>
+                <Text style={styles.userMetaText} allowFontScaling minimumFontScale={0.9}>Publié {formatDate(report.created_at)}</Text>
               </View>
             </View>
           </Pressable>
@@ -349,7 +370,7 @@ export function ReportDetailScreen({ route, navigation }: any) {
 
         {report.type === 'lost' && report.matches.length > 0 ? (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Objets trouvés similaires</Text>
+            <Text style={styles.sectionTitle} allowFontScaling minimumFontScale={0.9}>Objets trouvés similaires</Text>
             <FlatList
               data={report.matches.slice(0, 5)}
               horizontal
@@ -370,7 +391,7 @@ export function ReportDetailScreen({ route, navigation }: any) {
         ) : null}
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Actions</Text>
+          <Text style={styles.sectionTitle} allowFontScaling minimumFontScale={0.9}>Actions</Text>
           {isOwner ? (
             <>
               <Button
@@ -434,7 +455,7 @@ export function ReportDetailScreen({ route, navigation }: any) {
         <View style={styles.modalBackdrop}>
           <Pressable style={styles.modalFlex} onPress={() => setIsFlagModalOpen(false)} />
           <View style={styles.modalSheet}>
-            <Text style={styles.modalTitle}>Signaler ce contenu</Text>
+            <Text style={styles.modalTitle} allowFontScaling minimumFontScale={0.9}>Signaler ce contenu</Text>
             {FLAG_OPTIONS.map((option) => {
               const selected = selectedMotif === option.value;
               return (
@@ -442,11 +463,15 @@ export function ReportDetailScreen({ route, navigation }: any) {
                   key={option.value}
                   style={styles.radioRow}
                   onPress={() => setSelectedMotif(option.value)}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel={option.label}
+                  accessibilityState={{ selected }}
                 >
                   <View style={[styles.radioOuter, selected && styles.radioOuterSelected]}>
                     {selected ? <View style={styles.radioInner} /> : null}
                   </View>
-                  <Text style={styles.radioLabel}>{option.label}</Text>
+                  <Text style={styles.radioLabel} allowFontScaling minimumFontScale={0.9}>{option.label}</Text>
                 </Pressable>
               );
             })}
@@ -459,8 +484,12 @@ export function ReportDetailScreen({ route, navigation }: any) {
               onChangeText={(value) => setFlagDescription(value.slice(0, 300))}
               multiline
               textAlignVertical="top"
+              accessible={true}
+              accessibilityRole="text"
+              accessibilityLabel="Description du signalement"
+              accessibilityHint="Ajouter des details facultatifs"
             />
-            <Text style={styles.counter}>{flagDescription.length}/300</Text>
+            <Text style={styles.counter} allowFontScaling minimumFontScale={0.9}>{flagDescription.length}/300</Text>
 
             <View style={styles.modalActions}>
               <Button
@@ -501,6 +530,47 @@ const styles = StyleSheet.create({
   },
   retryButton: {
     marginTop: spacing.md,
+  },
+  skeletonRoot: {
+    flex: 1,
+    backgroundColor: colors.background.primary,
+  },
+  skeletonGallery: {
+    width: '100%',
+    height: 292,
+    borderRadius: 0,
+  },
+  skeletonSection: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.lg,
+  },
+  skeletonBadgeRow: {
+    width: 170,
+    height: 22,
+  },
+  skeletonMainTitle: {
+    width: '82%',
+    height: 28,
+    marginTop: spacing.md,
+  },
+  skeletonLineLong: {
+    width: '95%',
+    height: 14,
+    marginTop: spacing.sm,
+  },
+  skeletonParagraph: {
+    width: '100%',
+    height: 70,
+    marginTop: spacing.md,
+  },
+  skeletonSectionTitle: {
+    width: 100,
+    height: 18,
+    marginBottom: spacing.md,
+  },
+  skeletonUserCard: {
+    width: '100%',
+    height: 76,
   },
   gallerySection: {
     backgroundColor: colors.background.secondary,

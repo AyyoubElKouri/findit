@@ -16,6 +16,7 @@ import { Button } from '../../components/shared/Button';
 import { EmptyState } from '../../components/shared/EmptyState';
 import { ErrorMessage } from '../../components/shared/ErrorMessage';
 import { LoadingOverlay } from '../../components/shared/LoadingOverlay';
+import { SkeletonBlock } from '../../components/shared/SkeletonBlock';
 import { ReportCard } from '../../components/report/ReportCard';
 import { colors, spacing, typography } from '../../constants/theme';
 import { useFiltersStore } from '../../store/filters.store';
@@ -26,6 +27,24 @@ import type { FeedStackScreenProps } from '../../navigation/types';
 import { FilterSheet } from './FilterSheet';
 
 const LOCATION_FLAG_KEY = 'location_permission_asked';
+
+function FeedSkeletonList() {
+  return (
+    <View style={styles.skeletonContainer}>
+      {Array.from({ length: 5 }).map((_, index) => (
+        <View key={index} style={styles.skeletonCard}>
+          <SkeletonBlock style={styles.skeletonImage} />
+          <View style={styles.skeletonContent}>
+            <SkeletonBlock style={styles.skeletonTitle} />
+            <SkeletonBlock style={styles.skeletonMeta} />
+            <SkeletonBlock style={styles.skeletonAddress} />
+            <SkeletonBlock style={styles.skeletonStatus} />
+          </View>
+        </View>
+      ))}
+    </View>
+  );
+}
 
 export function FeedScreen({ navigation }: FeedStackScreenProps<typeof ROUTES.FEED_HOME>) {
   const filters = useFiltersStore();
@@ -61,12 +80,19 @@ export function FeedScreen({ navigation }: FeedStackScreenProps<typeof ROUTES.FE
 
   const renderHeader = () => (
     <View style={styles.header}>
-      <Text style={styles.headerTitle}>FindIt</Text>
-      <Pressable style={styles.filterIconWrapper} onPress={() => setIsFilterSheetOpen(true)}>
+      <Text style={styles.headerTitle} allowFontScaling minimumFontScale={0.9}>FindIt</Text>
+      <Pressable
+        style={styles.filterIconWrapper}
+        onPress={() => setIsFilterSheetOpen(true)}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel="Ouvrir les filtres"
+        accessibilityHint="Personnaliser la liste des signalements"
+      >
         <Ionicons name="options" size={22} color={colors.text.primary} />
         {filters.activeFiltersCount > 0 && (
           <View style={styles.filterBadge}>
-            <Text style={styles.filterBadgeText}>{filters.activeFiltersCount}</Text>
+            <Text style={styles.filterBadgeText} allowFontScaling minimumFontScale={0.9}>{filters.activeFiltersCount}</Text>
           </View>
         )}
       </Pressable>
@@ -94,14 +120,10 @@ export function FeedScreen({ navigation }: FeedStackScreenProps<typeof ROUTES.FE
 
         {error ? (
           <View style={styles.centered}>
-            <ErrorMessage message={error} />
-            <Button
-              title="Réessayer"
-              variant="secondary"
-              containerStyle={styles.retryButton}
-              onPress={refresh}
-            />
+            <ErrorMessage message={error} retryLabel="Réessayer" onRetry={refresh} />
           </View>
+        ) : isLoading && reports.length === 0 ? (
+          <FeedSkeletonList />
         ) : (
           <FlatList
             data={reports}
@@ -121,6 +143,8 @@ export function FeedScreen({ navigation }: FeedStackScreenProps<typeof ROUTES.FE
                 <EmptyState
                   title="Aucun signalement"
                   description={listEmpty}
+                  actionLabel={!location.coords && !location.manualAddress ? 'Activer la geolocalisation' : 'Actualiser'}
+                  onAction={!location.coords && !location.manualAddress ? handleAskLocation : refresh}
                 />
               )
             }
@@ -151,7 +175,7 @@ export function FeedScreen({ navigation }: FeedStackScreenProps<typeof ROUTES.FE
           <View style={styles.modalBackdrop}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Activer la géolocalisation</Text>
-              <Text style={styles.modalText}>
+              <Text style={styles.modalText} allowFontScaling minimumFontScale={0.9}>
                 FindIt utilise votre position pour afficher les objets perdus et trouvés à proximité.
                 Votre localisation est utilisée uniquement pour ce service.
               </Text>
@@ -237,6 +261,50 @@ const styles = StyleSheet.create({
   },
   retryButton: {
     marginTop: spacing.md,
+  },
+  skeletonContainer: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.xxl * 2,
+    paddingTop: spacing.sm,
+  },
+  skeletonCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.background.card,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
+  skeletonImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 12,
+  },
+  skeletonContent: {
+    flex: 1,
+    marginLeft: spacing.md,
+  },
+  skeletonTitle: {
+    width: '75%',
+    height: 16,
+  },
+  skeletonMeta: {
+    width: '58%',
+    height: 12,
+    marginTop: spacing.sm,
+  },
+  skeletonAddress: {
+    width: '90%',
+    height: 12,
+    marginTop: spacing.sm,
+  },
+  skeletonStatus: {
+    width: 68,
+    height: 20,
+    borderRadius: 10,
+    marginTop: spacing.sm,
   },
   filtersButtonWrapper: {
     position: 'absolute',
