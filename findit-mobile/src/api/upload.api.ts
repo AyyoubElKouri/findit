@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 export interface UploadImageResponse { url: string }
 export interface UploadApi { uploadImage: (localUri: string) => Promise<UploadImageResponse> }
@@ -29,9 +30,7 @@ export const uploadApi: UploadApi = {
       name: 'upload.' + ext,
     } as any);
 
-    // 4. POST
-    const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
-    const response = await axios.post(`${API_URL}/upload/image`, formData);
-    return { url: response.data.url, isUploading: false };
+    const response = await axios.post(`${API_BASE_URL}/upload/image`, formData);
+    return { url: response.data.url };
   },
 };
