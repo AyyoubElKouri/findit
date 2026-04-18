@@ -55,15 +55,6 @@ const reportSchema = z
     latitude: z.number(),
     longitude: z.number(),
     photos: z.array(z.string()).max(5, 'Maximum 5 photos'),
-  })
-  .superRefine((data, ctx) => {
-    if (data.type === 'found' && data.photos.length === 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['photos'],
-        message: 'Au moins une photo requise pour un objet trouvé',
-      });
-    }
   });
 
 type ReportFormValues = z.infer<typeof reportSchema>;
@@ -132,7 +123,6 @@ export function CreateReportScreen({ route, navigation }: any) {
   const adresse = watch('adresse');
   const latitude = watch('latitude');
   const longitude = watch('longitude');
-  const watchedPhotos = watch('photos');
   const descriptionValue = watch('description');
   const titreValue = watch('titre');
 
@@ -430,16 +420,44 @@ export function CreateReportScreen({ route, navigation }: any) {
       heure_evenement: values.heure_evenement || undefined,
     };
 
+    if (__DEV__) {
+      console.info('[CreateReportScreen] submit attempt', {
+        mode: reportId ? 'update' : 'create',
+        reportId,
+        type: payload.type,
+        photoCount: payload.photos.length,
+        hasAddress: Boolean(payload.adresse?.trim()),
+        latitude: payload.latitude,
+        longitude: payload.longitude,
+      });
+    }
+
     try {
       const response = reportId
         ? await reportsApi.updateReport<{ id: string }>(reportId, payload)
         : await reportsApi.createReport<{ id: string }>(payload);
+
+      if (__DEV__) {
+        console.info('[CreateReportScreen] submit success', {
+          mode: reportId ? 'update' : 'create',
+          responseId: response.id,
+        });
+      }
 
       navigation.navigate(ROUTES.FEED, {
         screen: ROUTES.REPORT_DETAIL,
         params: { reportId: response.id ?? reportId },
       });
     } catch (err) {
+      if (__DEV__) {
+        console.error('[CreateReportScreen] submit failed', {
+          mode: reportId ? 'update' : 'create',
+          reportId,
+          type: payload.type,
+          photoCount: payload.photos.length,
+          error: handleApiError(err),
+        });
+      }
       mapApiErrors(handleApiError(err));
     } finally {
       setIsSubmitting(false);
@@ -649,12 +667,6 @@ export function CreateReportScreen({ route, navigation }: any) {
         {errors.photos?.message ? (
           <Text style={styles.photoError}>{errors.photos.message}</Text>
         ) : null}
-
-        {currentType === 'found' && watchedPhotos.length === 0 ? (
-          <Text style={styles.warningText}>
-            Au moins une photo est requise pour un objet trouvé.
-          </Text>
-        ) : null}
       </View>
 
       <Button
@@ -846,11 +858,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   photoError: {
-    ...typography.caption,
-    color: colors.danger,
-    marginTop: spacing.sm,
-  },
-  warningText: {
     ...typography.caption,
     color: colors.danger,
     marginTop: spacing.sm,

@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Logger,
   Param,
   Patch,
   Post,
@@ -26,10 +27,15 @@ interface JwtRequest extends Request {
 @Controller('reports')
 @UseGuards(JwtAuthGuard)
 export class ReportsController {
+  private readonly logger = new Logger(ReportsController.name);
+
   constructor(private readonly reportsService: ReportsService) {}
 
   @Post()
   create(@Req() req: JwtRequest, @Body() dto: CreateReportDto) {
+    this.logger.log(
+      `Create report request userId=${req.user.id} type=${dto.type} photos=${dto.photos?.length ?? 0}`,
+    );
     return this.reportsService.create(req.user.id, dto);
   }
 

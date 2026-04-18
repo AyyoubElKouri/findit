@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -28,6 +29,8 @@ import { UpdateReportStatusDto } from './dto/update-report-status.dto';
 
 @Injectable()
 export class ReportsService {
+  private readonly logger = new Logger(ReportsService.name);
+
   constructor(
     @InjectRepository(Report)
     private readonly reportsRepository: Repository<Report>,
@@ -44,15 +47,16 @@ export class ReportsService {
   ) {}
 
   async create(userId: string, dto: CreateReportDto) {
-    this.ensureDateNotFuture(dto.date_evenement);
-
     const photos = dto.photos ?? [];
-    if (dto.type === ReportType.FOUND && photos.length === 0) {
-      throw new BadRequestException({ code: 'PHOTO_REQUIRED_FOR_FOUND' });
-    }
+    this.logger.log(
+      `Create start userId=${userId} type=${dto.type} photos=${photos.length} lat=${dto.latitude} lng=${dto.longitude}`,
+    );
+
+    this.ensureDateNotFuture(dto.date_evenement);
 
     const user = await this.usersRepository.findOne({ where: { id: userId } });
     if (!user || !user.is_active) {
+      this.logger.warn(`Create blocked userId=${userId} reason=INACTIVE_ACCOUNT`);
       throw new ForbiddenException('Inactive account');
     }
 
@@ -77,6 +81,7 @@ export class ReportsService {
     reportToCreate.is_visible = true;
 
     const report = await this.reportsRepository.save(reportToCreate);
+    this.logger.log(`Create persisted reportId=${report.id} userId=${userId}`);
 
     await Promise.all([
       this.usersRepository.save(user),
@@ -96,6 +101,8 @@ export class ReportsService {
     if (created.is_visible) {
       this.eventEmitter.emit('report.created', created);
     }
+
+    this.logger.log(`Create success reportId=${created.id} userId=${userId} type=${created.type}`);
 
     return this.serializeReportDetail(created, null, [], null);
   }
@@ -252,14 +259,6 @@ export class ReportsService {
 
     if (dto.date_evenement) {
       this.ensureDateNotFuture(dto.date_evenement);
-    }
-
-    if (
-      report.type === ReportType.FOUND &&
-      dto.photos &&
-      dto.photos.length === 0
-    ) {
-      throw new BadRequestException({ code: 'PHOTO_REQUIRED_FOR_FOUND' });
     }
 
     if (typeof dto.titre === 'string') {
