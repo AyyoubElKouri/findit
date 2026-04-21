@@ -16,6 +16,11 @@ export type FeedStackParamList = {
   [ROUTES.USER_PUBLIC_PROFILE]: { userId: string } | undefined;
 };
 
+export type MapStackParamList = {
+  [ROUTES.MAP_HOME]: undefined;
+  [ROUTES.REPORT_DETAIL]: { reportId: string };
+};
+
 export type FeedStackScreenProps<RouteName extends keyof FeedStackParamList> =
   NativeStackScreenProps<FeedStackParamList, RouteName>;
 
@@ -31,4 +36,5 @@ export type AppTabParamList = {
     | undefined;
   [ROUTES.CONVERSATIONS]: undefined;
   [ROUTES.PROFILE]: undefined;
+  [ROUTES.MAP]: undefined;
 };

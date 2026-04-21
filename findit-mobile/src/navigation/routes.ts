@@ -13,4 +13,6 @@ export const ROUTES = {
   CHAT: 'Chat',
   PROFILE: 'Profile',
   USER_PUBLIC_PROFILE: 'UserPublicProfile',
+  MAP: 'Map',
+  MAP_HOME: 'MapHome',
 } as const;
