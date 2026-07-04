@@ -10,12 +10,19 @@ import { FeedScreen } from '../screens/feed/FeedScreen';
 import { ProfileStack } from './profileStack';
 import { CreateReportScreen } from '../screens/report/CreateReportScreen';
 import { ReportDetailScreen } from '../screens/report/ReportDetailScreen';
+import { MapScreen } from '../screens/map/MapScreen';
 import { ROUTES } from './routes';
-import { AppTabParamList, ConversationsStackParamList, FeedStackParamList } from './types';
+import {
+  AppTabParamList,
+  ConversationsStackParamList,
+  FeedStackParamList,
+  MapStackParamList,
+} from './types';
 
 const Tabs = createBottomTabNavigator<AppTabParamList>();
 const FeedStack = createNativeStackNavigator<FeedStackParamList>();
 const ConversationsStack = createNativeStackNavigator<ConversationsStackParamList>();
+const MapStack = createNativeStackNavigator<MapStackParamList>();
 
 function FeedStackNavigator() {
   return (
@@ -39,6 +46,15 @@ function ConversationsStackNavigator() {
   );
 }
 
+function MapStackNavigator() {
+  return (
+    <MapStack.Navigator>
+      <MapStack.Screen name={ROUTES.MAP_HOME} component={MapScreen} options={{ title: 'Carte' }} />
+      <MapStack.Screen name={ROUTES.REPORT_DETAIL} component={ReportDetailScreen} options={{ title: 'Detail' }} />
+    </MapStack.Navigator>
+  );
+}
+
 export function AppNavigator() {
   const totalUnread = useChatStore((s) => s.getTotalUnread());
 
@@ -50,6 +66,7 @@ export function AppNavigator() {
         tabBarIcon: ({ color, size }) => {
           const map: Record<string, keyof typeof Ionicons.glyphMap> = {
             [ROUTES.FEED]: 'list',
+            [ROUTES.MAP]: 'map',
             [ROUTES.CREATE_REPORT]: 'add-circle',
             [ROUTES.CONVERSATIONS]: 'chatbubble-ellipses',
             [ROUTES.PROFILE]: 'person',
@@ -59,6 +76,7 @@ export function AppNavigator() {
       })}
     >
       <Tabs.Screen name={ROUTES.FEED} component={FeedStackNavigator} options={{ title: 'Feed' }} />
+      <Tabs.Screen name={ROUTES.MAP} component={MapStackNavigator} options={{ title: 'Carte' }} />
       <Tabs.Screen name={ROUTES.CREATE_REPORT} component={CreateReportScreen} options={{ title: 'Creer' }} />
       <Tabs.Screen
         name={ROUTES.CONVERSATIONS}
