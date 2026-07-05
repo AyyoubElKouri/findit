@@ -30,7 +30,7 @@ export class ListReportsQueryDto {
   @IsOptional()
   @IsNumber()
   @Min(1)
-  @Max(50000)
+  @Max(100000)
   radius?: number;
 
   @IsOptional()

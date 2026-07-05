@@ -116,7 +116,7 @@ export class ReportsService {
       query.manual_address,
     );
 
-    const radius = Math.min(query.radius ?? 10000, 50000);
+    const radius = Math.min(query.radius ?? 50000, 100000);
     const type = query.type ?? 'lost';
     const statut = query.statut ?? 'en_attente';
     const dateRange = query.date_range ?? 'all';

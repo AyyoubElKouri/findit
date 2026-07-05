@@ -22,7 +22,8 @@
     "docker:down": "docker compose down",
     "docker:reset": "docker compose down -v && docker compose up -d",
     "docker:logs": "docker compose logs -f",
-    "db:connect": "docker exec -it nestjs_postgres psql -U api_user -d findit"
+    "db:connect": "docker exec -it nestjs_postgres psql -U api_user -d findit",
+    "db:seed": "ts-node src/database/seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
