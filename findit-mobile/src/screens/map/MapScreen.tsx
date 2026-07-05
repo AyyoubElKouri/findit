@@ -4,13 +4,11 @@ import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import { ReusableMapView, ReusableMapViewRef } from '../../components/shared/MapView';
 import { useTopBarOffset } from '../../components/shared/ScreenHeader';
+import { CATEGORIES } from '../../constants/categories';
 import { colors, spacing, borderRadius, typography } from '../../constants/theme';
 import { useNavigation } from '@react-navigation/native';
 import { ROUTES } from '../../navigation/routes';
 import { useInfiniteReports } from '../../hooks/useInfiniteReports';
-
- const LOST_PLACEHOLDER = require('../../../assets/icon.png');
- const FOUND_PLACEHOLDER = require('../../../assets/adaptive-icon.png');
 
  export function MapScreen() {
   const { reports, refresh, isLoading, error } = useInfiniteReports();
@@ -66,20 +64,24 @@ import { useInfiniteReports } from '../../hooks/useInfiniteReports';
 
   const mapMarkers = reports
     .filter((report) => Number.isFinite(report.latitude) && Number.isFinite(report.longitude))
-    .map((report) => ({
-      id: report.id,
-      latitude: report.latitude as number,
-      longitude: report.longitude as number,
-      title: report.titre,
-      description: report.adresse,
-      color: report.type === 'lost' ? colors.danger : colors.secondary,
-      imageSource: report.type === 'lost' ? LOST_PLACEHOLDER : FOUND_PLACEHOLDER,
-      onPress: () => {
-        navigation.navigate(ROUTES.REPORT_DETAIL, {
-          reportId: report.id,
-        });
-      }
-    }));
+    .map((report) => {
+      const category = CATEGORIES.find((item) => item.value === report.categorie);
+      return {
+        id: report.id,
+        latitude: report.latitude as number,
+        longitude: report.longitude as number,
+        title: report.titre,
+        description: report.adresse,
+        color: report.type === 'lost' ? colors.danger : colors.secondary,
+        imageUri: report.first_photo_url,
+        fallbackIcon: category?.icon ?? '📦',
+        onPress: () => {
+          navigation.navigate(ROUTES.REPORT_DETAIL, {
+            reportId: report.id,
+          });
+        },
+      };
+    });
 
   if (loadingLocation && !location) {
     return (
