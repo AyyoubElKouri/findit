@@ -233,6 +233,22 @@ npx expo start
 
 Scan the QR code with Expo Go, or press `a` for Android emulator / `i` for iOS simulator.
 
+### Quick start (all services)
+
+From the repo root, one script starts the database, API, and Expo app in tmux — and auto-updates the mobile `.env` with your LAN IP for physical devices:
+
+```bash
+./start.sh
+```
+
+Requires Docker, tmux, and Node.js 22+. Tabs: **database** · **api** · **mobile**. Detach with `Ctrl+b` then `d`.
+
+Optional: seed demo data after the API is up:
+
+```bash
+cd findit-api && npm run db:seed
+```
+
 ---
 
 ## Project Structure
