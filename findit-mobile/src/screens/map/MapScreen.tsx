@@ -3,16 +3,16 @@ import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, Alert } fr
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import { ReusableMapView, ReusableMapViewRef } from '../../components/shared/MapView';
+import { useTopBarOffset } from '../../components/shared/ScreenHeader';
+import { CATEGORIES } from '../../constants/categories';
 import { colors, spacing, borderRadius, typography } from '../../constants/theme';
 import { useNavigation } from '@react-navigation/native';
 import { ROUTES } from '../../navigation/routes';
 import { useInfiniteReports } from '../../hooks/useInfiniteReports';
 
- const LOST_PLACEHOLDER = require('../../../assets/icon.png');
- const FOUND_PLACEHOLDER = require('../../../assets/adaptive-icon.png');
-
  export function MapScreen() {
   const { reports, refresh, isLoading, error } = useInfiniteReports();
+  const topBarOffset = useTopBarOffset(spacing.md);
 
   useEffect(() => {
     console.info('[MapScreen] reports updated:', reports.length, reports);
@@ -64,20 +64,24 @@ import { useInfiniteReports } from '../../hooks/useInfiniteReports';
 
   const mapMarkers = reports
     .filter((report) => Number.isFinite(report.latitude) && Number.isFinite(report.longitude))
-    .map((report) => ({
-      id: report.id,
-      latitude: report.latitude as number,
-      longitude: report.longitude as number,
-      title: report.titre,
-      description: report.adresse,
-      color: report.type === 'lost' ? colors.danger : colors.secondary,
-      imageSource: report.type === 'lost' ? LOST_PLACEHOLDER : FOUND_PLACEHOLDER,
-      onPress: () => {
-        navigation.navigate(ROUTES.REPORT_DETAIL, {
-          reportId: report.id,
-        });
-      }
-    }));
+    .map((report) => {
+      const category = CATEGORIES.find((item) => item.value === report.categorie);
+      return {
+        id: report.id,
+        latitude: report.latitude as number,
+        longitude: report.longitude as number,
+        title: report.titre,
+        description: report.adresse,
+        color: report.type === 'lost' ? colors.danger : colors.secondary,
+        imageUri: report.first_photo_url,
+        fallbackIcon: category?.icon ?? '📦',
+        onPress: () => {
+          navigation.navigate(ROUTES.REPORT_DETAIL, {
+            reportId: report.id,
+          });
+        },
+      };
+    });
 
   if (loadingLocation && !location) {
     return (
@@ -103,7 +107,7 @@ import { useInfiniteReports } from '../../hooks/useInfiniteReports';
       />
 
       {(error || !location) && (
-        <View style={styles.errorContainer}>
+        <View style={[styles.errorContainer, { top: topBarOffset + 72 }]}>
           <Text style={styles.errorText}>
             {error || "En attente de votre position GPS..."}
           </Text>
@@ -133,7 +137,7 @@ import { useInfiniteReports } from '../../hooks/useInfiniteReports';
         </TouchableOpacity>
       </View>
 
-      <View style={styles.header}>
+      <View style={[styles.header, { top: topBarOffset }]}>
         <Text style={styles.headerTitle}>Exploration</Text>
         <View style={styles.legend}>
           <View style={styles.legendItem}>
@@ -167,7 +171,6 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     position: 'absolute',
-    top: spacing.xl * 2,
     left: spacing.md,
     right: spacing.md,
     backgroundColor: 'rgba(239, 68, 68, 0.9)',
@@ -200,7 +203,6 @@ const styles = StyleSheet.create({
   },
   header: {
     position: 'absolute',
-    top: spacing.xl,
     left: spacing.md,
     right: spacing.md,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',

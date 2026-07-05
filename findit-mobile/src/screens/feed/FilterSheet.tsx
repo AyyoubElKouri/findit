@@ -60,7 +60,7 @@ export function FilterSheet({ visible, onClose }: FilterSheetProps) {
             <View style={styles.section}>
               <Text style={styles.sectionTitle} allowFontScaling minimumFontScale={0.9}>Rayon</Text>
               <View style={styles.rowWrap}>
-                {[1000, 5000, 10000, 25000, 50000].map((value) => (
+                {[1000, 5000, 10000, 25000, 50000, 75000, 100000].map((value) => (
                   <Chip
                     key={value}
                     label={`${value / 1000} km`}

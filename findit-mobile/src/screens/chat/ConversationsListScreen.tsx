@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { conversationsApi } from '../../api/conversations.api';
 import { ConversationItem } from '../../components/chat/ConversationItem';
+import { ScreenHeader } from '../../components/shared/ScreenHeader';
 import { useChatStore } from '../../store/chat.store';
 import { ConversationSummary } from '../../types/api.types';
 import { ROUTES } from '../../navigation/routes';
@@ -82,9 +83,9 @@ export function ConversationsListScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <ScreenHeader style={styles.header}>
         <Text style={styles.headerTitle}>Messages</Text>
-      </View>
+      </ScreenHeader>
 
       <FlatList
         data={flatData}
@@ -117,7 +118,6 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.lg,
     paddingBottom: spacing.sm,
     backgroundColor: colors.background.primary,
   },

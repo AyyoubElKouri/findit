@@ -2,7 +2,7 @@
 <!--
 Description: findit is a mobile app that helps people find lost items by connecting lost-and-found reports through smart matching and real-time chat. Built with NestJS, PostgreSQL/PostGIS, and React Native (Expo).
 Keywords: lost and found, findit, react native, expo, nestjs, postgresql, postgis, real-time chat, matching algorithm
-author: Ayyoub EL Kouri
+author: Ayyoub EL Kouri, Taha Hammadate, Yassine El Barni
 canonical: https://github.com/AyyoubElKouri/findit
 -->
 
@@ -129,6 +129,28 @@ Built with a NestJS API backed by PostGIS for spatial queries and an Expo/React 
 
 ---
 
+## Screenshots
+
+<p align="center">
+  <img src="public/images/home.jpg" alt="Feed — browse lost and found reports nearby" width="260" />
+  <img src="public/images/filter.jpg" alt="Filters — refine by type, radius, category, and status" width="260" />
+  <img src="public/images/map.jpg" alt="Map — explore reports with photo markers" width="260" />
+</p>
+<p align="center">
+  <em>Feed · Filters · Map</em>
+</p>
+
+<p align="center">
+  <img src="public/images/create_claim_part.jpg" alt="Create report — item details and category" width="260" />
+  <img src="public/images/create_claim_full.jpg" alt="Create report — location and photos" width="260" />
+  <img src="public/images/chat.jpg" alt="Chat — coordinate returns in real time" width="260" />
+</p>
+<p align="center">
+  <em>Create report · Location & photos · Chat</em>
+</p>
+
+---
+
 ## Tech Stack
 
 | Layer | Technologies |
@@ -210,6 +232,22 @@ npx expo start
 ```
 
 Scan the QR code with Expo Go, or press `a` for Android emulator / `i` for iOS simulator.
+
+### Quick start (all services)
+
+From the repo root, one script starts the database, API, and Expo app in tmux — and auto-updates the mobile `.env` with your LAN IP for physical devices:
+
+```bash
+./start.sh
+```
+
+Requires Docker, tmux, and Node.js 22+. Tabs: **database** · **api** · **mobile**. Detach with `Ctrl+b` then `d`.
+
+Optional: seed demo data after the API is up:
+
+```bash
+cd findit-api && npm run db:seed
+```
 
 ---
 
@@ -301,6 +339,6 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 
 <div align="center">
 
-**findit** - Built by [Ayyoub EL Kouri](https://github.com/AyyoubElKouri)
+**findit** - Built by [Ayyoub EL Kouri](https://github.com/AyyoubElKouri), [Taha Hammadate](https://github.com/hammtah), [Yassine El Barni](https://github.com/yassineelbarni-u)
 
 </div>

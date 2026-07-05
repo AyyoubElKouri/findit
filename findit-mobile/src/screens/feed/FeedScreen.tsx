@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button } from '../../components/shared/Button';
+import { ScreenHeader } from '../../components/shared/ScreenHeader';
 import { EmptyState } from '../../components/shared/EmptyState';
 import { ErrorMessage } from '../../components/shared/ErrorMessage';
 import { LoadingOverlay } from '../../components/shared/LoadingOverlay';
@@ -79,7 +80,7 @@ export function FeedScreen({ navigation }: FeedStackScreenProps<typeof ROUTES.FE
   };
 
   const renderHeader = () => (
-    <View style={styles.header}>
+    <ScreenHeader style={styles.header}>
       <Text style={styles.headerTitle} allowFontScaling minimumFontScale={0.9}>FindIt</Text>
       <Pressable
         style={styles.filterIconWrapper}
@@ -96,7 +97,7 @@ export function FeedScreen({ navigation }: FeedStackScreenProps<typeof ROUTES.FE
           </View>
         )}
       </Pressable>
-    </View>
+    </ScreenHeader>
   );
 
   const renderFooter = () =>
@@ -112,7 +113,7 @@ export function FeedScreen({ navigation }: FeedStackScreenProps<typeof ROUTES.FE
       : "Aucun signalement dans cette zone pour l'instant.";
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['bottom']}>
       <View style={styles.container}>
         {renderHeader()}
 

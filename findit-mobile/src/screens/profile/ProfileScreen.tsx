@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Alert, Button, ScrollView, StyleSheet, Text, View, TouchableOpacity, FlatList, ListRenderItem } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Avatar } from '../../components/shared/Avatar';
+import { ScreenHeader } from '../../components/shared/ScreenHeader';
 import { StarRating } from '../../components/shared/StarRating';
 import { useAuthStore } from '../../store/auth.store';
 import { usersApi } from '../../api/users.api';
@@ -43,6 +44,10 @@ export function ProfileScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 32 }}>
+      <ScreenHeader style={styles.pageHeader}>
+        <Text style={styles.pageTitle}>Profil</Text>
+      </ScreenHeader>
+
       {/* Section 1 — Identité */}
       <View style={styles.identitySection}>
         <Avatar size={80} uri={user.photo_url} />
@@ -111,7 +116,15 @@ export function ProfileScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background.primary },
-  identitySection: { alignItems: 'center', marginBottom: spacing.lg },
+  pageHeader: {
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.sm,
+  },
+  pageTitle: {
+    ...typography.h2,
+    color: colors.text.primary,
+  },
+  identitySection: { alignItems: 'center', marginBottom: spacing.lg, paddingHorizontal: spacing.lg },
   name: { ...typography.h2, color: colors.text.primary, marginTop: spacing.sm },
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   ratingLabel: { ...typography.body, marginLeft: spacing.xs },

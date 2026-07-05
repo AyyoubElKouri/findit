@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 type Type = 'lost' | 'found' | 'all';
-type Radius = 1000 | 5000 | 10000 | 25000 | 50000;
+type Radius = 1000 | 5000 | 10000 | 25000 | 50000 | 75000 | 100000;
 type DateRange = 'today' | '7days' | '30days' | 'all';
 type Statut = 'en_attente' | 'resolu' | 'rendu' | 'all';
 
@@ -23,7 +23,7 @@ interface FiltersState extends BaseFilters {
 
 const defaults: BaseFilters = {
   type: 'all',
-  radius: 50000,
+  radius: 100000,
   categorie: null,
   dateRange: 'all',
   statut: 'all',

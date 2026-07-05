@@ -1,5 +1,6 @@
-import React, { forwardRef, useImperativeHandle, useRef } from 'react';
-import { Image, ImageSourcePropType, StyleSheet, View, ViewStyle } from 'react-native';
+import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { ImageSourcePropType, StyleSheet, Text, View, ViewStyle } from 'react-native';
+import { Image } from 'expo-image';
 import MapView, { Marker, PROVIDER_DEFAULT, Region } from 'react-native-maps';
 import { colors } from '../../constants/theme';
 
@@ -11,7 +12,9 @@ export interface MapMarker {
   description?: string;
   onPress?: () => void;
   color?: string;
+  imageUri?: string | null;
   imageSource?: ImageSourcePropType;
+  fallbackIcon?: string;
 }
 
 export interface ReusableMapViewProps {
@@ -26,6 +29,75 @@ export interface ReusableMapViewProps {
 export interface ReusableMapViewRef {
   animateToRegion: (region: Region, duration?: number) => void;
   fitToCoordinates: (coordinates: { latitude: number; longitude: number }[], options?: any) => void;
+}
+
+function CustomMapMarker({ marker }: { marker: MapMarker }) {
+  const hasCustomImage = Boolean(marker.imageUri || marker.imageSource);
+  const [tracksViewChanges, setTracksViewChanges] = useState(hasCustomImage);
+
+  const stopTracking = () => setTracksViewChanges(false);
+
+  if (!hasCustomImage && !marker.fallbackIcon) {
+    return (
+      <Marker
+        key={marker.id}
+        coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
+        title={marker.title}
+        description={marker.description}
+        onPress={marker.onPress}
+        pinColor={marker.color ?? colors.primary}
+        tracksViewChanges={false}
+      />
+    );
+  }
+
+  return (
+    <Marker
+      coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
+      title={marker.title}
+      description={marker.description}
+      onPress={marker.onPress}
+      tracksViewChanges={tracksViewChanges}
+      anchor={{ x: 0.5, y: 1 }}
+    >
+      <View style={styles.markerWrap} collapsable={false}>
+        <View
+          style={[
+            styles.markerCircle,
+            { borderColor: marker.color ?? colors.primary },
+          ]}
+        >
+          {marker.imageUri ? (
+            <Image
+              source={{ uri: marker.imageUri }}
+              style={styles.markerImage}
+              contentFit="cover"
+              onLoad={stopTracking}
+              onError={stopTracking}
+            />
+          ) : marker.imageSource ? (
+            <Image
+              source={marker.imageSource}
+              style={styles.markerImage}
+              contentFit="cover"
+              onLoad={stopTracking}
+              onError={stopTracking}
+            />
+          ) : (
+            <View style={styles.markerFallback}>
+              <Text style={styles.markerFallbackIcon}>{marker.fallbackIcon ?? '📦'}</Text>
+            </View>
+          )}
+        </View>
+        <View
+          style={[
+            styles.markerPointer,
+            { backgroundColor: marker.color ?? colors.primary },
+          ]}
+        />
+      </View>
+    </Marker>
+  );
 }
 
 export const ReusableMapView = forwardRef<ReusableMapViewRef, ReusableMapViewProps>(
@@ -53,53 +125,9 @@ export const ReusableMapView = forwardRef<ReusableMapViewRef, ReusableMapViewPro
           onRegionChangeComplete={onRegionChangeComplete}
           onPress={onPress}
         >
-          {markers.map((marker) => {
-            if (!marker.imageSource) {
-              return (
-                <Marker
-                  key={marker.id}
-                  coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
-                  title={marker.title}
-                  description={marker.description}
-                  onPress={marker.onPress}
-                  pinColor={marker.color ?? colors.primary}
-                  tracksViewChanges={false}
-                />
-              );
-            }
-
-            return (
-              <Marker
-                key={marker.id}
-                coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}
-                title={marker.title}
-                description={marker.description}
-                onPress={marker.onPress}
-                tracksViewChanges={true}
-              >
-                <View style={styles.markerWrap}>
-                  <View
-                    style={[
-                      styles.markerCircle,
-                      { borderColor: marker.color ?? colors.primary },
-                    ]}
-                  >
-                    <Image
-                      source={marker.imageSource}
-                      style={styles.markerImage}
-                      resizeMode="cover"
-                    />
-                  </View>
-                  <View
-                    style={[
-                      styles.markerPointer,
-                      { backgroundColor: marker.color ?? colors.primary },
-                    ]}
-                  />
-                </View>
-              </Marker>
-            );
-          })}
+          {markers.map((marker) => (
+            <CustomMapMarker key={marker.id} marker={marker} />
+          ))}
         </MapView>
       </View>
     );
@@ -133,6 +161,15 @@ const styles = StyleSheet.create({
   markerImage: {
     width: '100%',
     height: '100%',
+  },
+  markerFallback: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.background.secondary,
+  },
+  markerFallbackIcon: {
+    fontSize: 22,
   },
   markerPointer: {
     width: 10,

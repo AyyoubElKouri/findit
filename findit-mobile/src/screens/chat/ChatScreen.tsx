@@ -16,6 +16,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 
 import { uploadApi } from '../../api/upload.api';
 import { Avatar } from '../../components/shared/Avatar';
+import { ScreenHeader } from '../../components/shared/ScreenHeader';
 import { borderRadius, colors, spacing, typography } from '../../constants/theme';
 import { useConversation } from '../../hooks/useConversation';
 import { useAuthStore } from '../../store/auth.store';
@@ -135,7 +136,7 @@ export function ChatScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 84 : 0}
     >
-      <View style={styles.header}>
+      <ScreenHeader style={styles.header}>
         <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="chevron-back" size={22} color={colors.text.primary} />
         </Pressable>
@@ -150,7 +151,7 @@ export function ChatScreen() {
         <Pressable style={styles.moreButton}>
           <Ionicons name="ellipsis-horizontal" size={20} color={colors.text.primary} />
         </Pressable>
-      </View>
+      </ScreenHeader>
 
       {conversation ? (
         <ConversationStatusBanner
@@ -228,7 +229,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
     paddingBottom: spacing.sm,
     backgroundColor: colors.background.primary,
     borderBottomWidth: 1,
