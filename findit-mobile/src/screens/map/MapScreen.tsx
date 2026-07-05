@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, TouchableOpacity, ActivityIndicator, Alert } fr
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import { ReusableMapView, ReusableMapViewRef } from '../../components/shared/MapView';
+import { useTopBarOffset } from '../../components/shared/ScreenHeader';
 import { colors, spacing, borderRadius, typography } from '../../constants/theme';
 import { useNavigation } from '@react-navigation/native';
 import { ROUTES } from '../../navigation/routes';
@@ -13,6 +14,7 @@ import { useInfiniteReports } from '../../hooks/useInfiniteReports';
 
  export function MapScreen() {
   const { reports, refresh, isLoading, error } = useInfiniteReports();
+  const topBarOffset = useTopBarOffset(spacing.md);
 
   useEffect(() => {
     console.info('[MapScreen] reports updated:', reports.length, reports);
@@ -103,7 +105,7 @@ import { useInfiniteReports } from '../../hooks/useInfiniteReports';
       />
 
       {(error || !location) && (
-        <View style={styles.errorContainer}>
+        <View style={[styles.errorContainer, { top: topBarOffset + 72 }]}>
           <Text style={styles.errorText}>
             {error || "En attente de votre position GPS..."}
           </Text>
@@ -133,7 +135,7 @@ import { useInfiniteReports } from '../../hooks/useInfiniteReports';
         </TouchableOpacity>
       </View>
 
-      <View style={styles.header}>
+      <View style={[styles.header, { top: topBarOffset }]}>
         <Text style={styles.headerTitle}>Exploration</Text>
         <View style={styles.legend}>
           <View style={styles.legendItem}>
@@ -167,7 +169,6 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     position: 'absolute',
-    top: spacing.xl * 2,
     left: spacing.md,
     right: spacing.md,
     backgroundColor: 'rgba(239, 68, 68, 0.9)',
@@ -200,7 +201,6 @@ const styles = StyleSheet.create({
   },
   header: {
     position: 'absolute',
-    top: spacing.xl,
     left: spacing.md,
     right: spacing.md,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',

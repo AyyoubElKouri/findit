@@ -18,6 +18,7 @@ import { z } from 'zod';
 import { reportsApi } from '../../api/reports.api';
 import { uploadApi } from '../../api/upload.api';
 import { Button } from '../../components/shared/Button';
+import { useTopBarOffset } from '../../components/shared/ScreenHeader';
 import { ErrorMessage } from '../../components/shared/ErrorMessage';
 import { Input } from '../../components/shared/Input';
 import { CATEGORIES, CategoryValue } from '../../constants/categories';
@@ -102,6 +103,7 @@ export function CreateReportScreen({ route, navigation }: any) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isResolvingAddress, setIsResolvingAddress] = useState(false);
   const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
+  const topBarOffset = useTopBarOffset(spacing.md);
 
   const {
     control,
@@ -473,7 +475,10 @@ export function CreateReportScreen({ route, navigation }: any) {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={[styles.content, { paddingTop: topBarOffset }]}
+    >
       <Text style={styles.title}>{reportId ? 'Modifier le signalement' : 'Créer un signalement'}</Text>
 
       {submitError ? <ErrorMessage message={submitError} /> : null}

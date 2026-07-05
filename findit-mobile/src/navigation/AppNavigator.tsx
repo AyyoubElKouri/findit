@@ -30,7 +30,7 @@ function FeedStackNavigator() {
       <FeedStack.Screen
         name={ROUTES.FEED_HOME}
         component={FeedScreen}
-        options={{ title: 'FindIt' }}
+        options={{ headerShown: false }}
       />
       <FeedStack.Screen name={ROUTES.REPORT_DETAIL} component={ReportDetailScreen} options={{ title: 'Detail' }} />
     </FeedStack.Navigator>
@@ -49,7 +49,7 @@ function ConversationsStackNavigator() {
 function MapStackNavigator() {
   return (
     <MapStack.Navigator>
-      <MapStack.Screen name={ROUTES.MAP_HOME} component={MapScreen} options={{ title: 'Carte' }} />
+      <MapStack.Screen name={ROUTES.MAP_HOME} component={MapScreen} options={{ headerShown: false }} />
       <MapStack.Screen name={ROUTES.REPORT_DETAIL} component={ReportDetailScreen} options={{ title: 'Detail' }} />
     </MapStack.Navigator>
   );
